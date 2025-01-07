@@ -1,0 +1,30 @@
+server:
+  port: 3000
+
+spring:
+  application:
+    name: api-gw
+
+  profiles:
+    active: dev
+
+  cloud:
+    gateway:
+      routes:
+        - id: customer-app
+          uri: lb://CUSTOMER-APP
+          predicates:
+            - Path=/api/v1/customers/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9000/eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0

@@ -1,0 +1,46 @@
+server:
+  port: 8081
+
+spring:
+  application:
+    name: customer-app
+
+  profiles:
+    active: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5435/eureka-services
+    username: postgres
+    password: password
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+
+  rabbitmq:
+    username: rmuser
+    password: rmpassword
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      key-deserializer: org.apache.kafka.common.serialization.StringSerializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+springdoc:
+  swagger-ui:
+    path: /swagger.html
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:9000/eureka
+  instance:
+    prefer-ip-address: true
+
+management:
+  tracing:
+    enabled: true
+    sampling:
+      probability: 1.0

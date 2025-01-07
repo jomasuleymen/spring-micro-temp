@@ -1,0 +1,74 @@
+services:
+  db:
+    image: postgres:17.2-alpine
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    environment:
+      POSTGRES_USER: ${DB_USER:?DB_USER is not specified}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is not specified}
+      POSTGRES_DB: ${DB_NAME:?DB_NAME is not specified}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  zipkin:
+    image: openzipkin/zipkin:3.4.2
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - "9411:9411"
+
+  rabbitmq:
+    image: rabbitmq:4.0.5-management-alpine
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  zookeeper:
+    image: bitnami/zookeeper:3.9.3
+    environment:
+      ZOO_PORT_NUMBER: 2181
+      ZOO_TICK_TIME: 2000
+      ALLOW_ANONYMOUS_LOGIN: yes
+    ports:
+      - "2181:2181"
+    volumes:
+      - zookeeper_data:/bitnami/zookeeper
+
+  kafka:
+    image: bitnami/kafka:3.9.0
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    hostname: kafka
+    environment:
+      KAFKA_CFG_NODE_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CFG_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://0.0.0.0:9092
+      KAFKA_CFG_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: INTERNAL
+    volumes:
+      - kafka_data:/bitnami/kafka
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  zookeeper_data:
+  kafka_data:
+  prometheus_data:

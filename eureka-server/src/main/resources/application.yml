@@ -1,0 +1,22 @@
+server:
+  port: 9000
+
+spring:
+  application:
+    name: eureka-server-app
+
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+  instance:
+    prefer-ip-address: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
