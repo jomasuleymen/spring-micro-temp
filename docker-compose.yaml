@@ -63,6 +63,8 @@ services:
     volumes:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
+    extra_hosts:
+      - "host.docker.internal:172.18.144.1"
     network_mode: host
 
   grafana:

@@ -25,14 +25,4 @@ management:
   endpoints:
     web:
       exposure:
-        include: '*'
-  endpoint:
-    prometheus:
-      access: read_only
-
-
-  prometheus:
-    metrics:
-      export:
-        pushgateway:
-          enabled: true
+        include: health,prometheus
